@@ -65,14 +65,17 @@ target_link_libraries(${PROJECT_NAME}
         juce::juce_recommended_warning_flags
 )
 
-# Copy web resources
-if(NOT DRIFT_DEV_MODE)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/Resources/WebUI
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/WebUI
-    )
-endif()
+# Copy web resources - use custom target that always runs
+add_custom_target(${PROJECT_NAME}_CopyWebUI ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/Resources/WebUI
+    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_artefacts/$<CONFIG>/Standalone/WebUI
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/Resources/WebUI
+    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_artefacts/$<CONFIG>/Standalone/Resources/WebUI
+    COMMENT "Copying WebUI resources to Standalone..."
+)
+add_dependencies(${PROJECT_NAME}_Standalone ${PROJECT_NAME}_CopyWebUI)
 
 # BeatConnect SDK Integration
 option(BEATCONNECT_ENABLE_ACTIVATION "Enable BeatConnect activation" OFF)

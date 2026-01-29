@@ -1,48 +1,48 @@
-import { useState, useEffect, useCallback } from 'react';
-import { isInJuceWebView, addEventListener, removeEventListener } from '../lib/juce-bridge';
+import { useState, useEffect } from 'react';
+import { isInJuceWebView, addEventListener } from '../lib/juce-bridge';
 
 export interface DriftVisualizerData {
-  grainActivity: number;
-  currentPitch: number;
-  outputLevel: number;
-  isFrozen: boolean;
+  inputLevel: number;
+  duckEnvelope: number;
+  tap1Level: number;
+  tap2Level: number;
+  tap3Level: number;
+  tap4Level: number;
 }
 
 const defaultData: DriftVisualizerData = {
-  grainActivity: 0,
-  currentPitch: 0,
-  outputLevel: 0,
-  isFrozen: false,
+  inputLevel: 0,
+  duckEnvelope: 0,
+  tap1Level: 0,
+  tap2Level: 0,
+  tap3Level: 0,
+  tap4Level: 0,
 };
 
 export function useVisualizerData(): DriftVisualizerData {
   const [data, setData] = useState<DriftVisualizerData>(defaultData);
 
-  const handleVisualizerData = useCallback((eventData: any) => {
-    if (eventData && typeof eventData === 'object') {
-      setData({
-        grainActivity: eventData.grainActivity ?? 0,
-        currentPitch: eventData.currentPitch ?? 0,
-        outputLevel: eventData.outputLevel ?? 0,
-        isFrozen: eventData.isFrozen ?? false,
-      });
-    }
-  }, []);
-
   useEffect(() => {
     if (!isInJuceWebView()) {
-      // Demo mode animation
+      // Demo animation when not in JUCE
       let animationFrame: number;
       let time = 0;
 
       const animate = () => {
         time += 0.016;
 
+        // Smooth demo animation
+        const pulse = Math.sin(time * 2) * 0.5 + 0.5;
+        const inputLevel = 0.2 + pulse * 0.5;
+        const drift = Math.sin(time * 0.3) * 0.5;
+
         setData({
-          grainActivity: 0.3 + Math.sin(time * 2) * 0.2 + Math.random() * 0.2,
-          currentPitch: Math.sin(time * 0.5) * 12,
-          outputLevel: 0.4 + Math.sin(time * 3) * 0.2 + Math.random() * 0.1,
-          isFrozen: false,
+          inputLevel: inputLevel,
+          duckEnvelope: drift,
+          tap1Level: inputLevel * 0.7,
+          tap2Level: inputLevel * 0.5,
+          tap3Level: inputLevel * 0.3,
+          tap4Level: inputLevel * 0.15,
         });
 
         animationFrame = requestAnimationFrame(animate);
@@ -52,9 +52,23 @@ export function useVisualizerData(): DriftVisualizerData {
       return () => cancelAnimationFrame(animationFrame);
     }
 
-    addEventListener('visualizerData', handleVisualizerData);
-    return () => removeEventListener('visualizerData', handleVisualizerData);
-  }, [handleVisualizerData]);
+    // In JUCE, listen for visualizer data events
+    const unsubscribe = addEventListener('visualizerData', (eventData: unknown) => {
+      const d = eventData as Record<string, number>;
+      if (d && typeof d === 'object') {
+        setData({
+          inputLevel: d.inputLevel ?? 0,
+          duckEnvelope: d.duckEnvelope ?? 0,
+          tap1Level: d.tap1Level ?? 0,
+          tap2Level: d.tap2Level ?? 0,
+          tap3Level: d.tap3Level ?? 0,
+          tap4Level: d.tap4Level ?? 0,
+        });
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   return data;
 }

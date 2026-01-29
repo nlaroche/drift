@@ -2,29 +2,18 @@
 
 namespace ParameterIDs
 {
-    // Grain Parameters
-    inline constexpr const char* grainSize     = "grainSize";      // 10-500ms
-    inline constexpr const char* grainDensity  = "grainDensity";   // 1-32 grains
-    inline constexpr const char* grainSpread   = "grainSpread";    // 0-100% position randomization
+    // DRIFT - Wandering Delay
+    inline constexpr const char* time     = "time";     // 10 to 2000 ms
+    inline constexpr const char* sync     = "sync";     // tempo sync on/off
+    inline constexpr const char* division = "division"; // musical division (1/4, 1/8, etc.)
+    inline constexpr const char* feedback = "feedback"; // 0 to 100%
+    inline constexpr const char* duck     = "duck";     // 0 to 100% - ducking amount
+    inline constexpr const char* taps     = "taps";     // 1 to 4 taps
+    inline constexpr const char* spread   = "spread";   // 0 to 100% - stereo spread
+    inline constexpr const char* mix      = "mix";      // 0 to 100%
 
-    // Pitch Parameters
-    inline constexpr const char* pitch         = "pitch";          // -24 to +24 semitones
-    inline constexpr const char* pitchScatter  = "pitchScatter";   // 0-100% random pitch variation
-    inline constexpr const char* shimmer       = "shimmer";        // 0-100% octave up feedback
-
-    // Time Parameters
-    inline constexpr const char* stretch       = "stretch";        // 0.25x - 4x time stretch
-    inline constexpr const char* reverse       = "reverse";        // 0-100% reverse grain probability
-    inline constexpr const char* freeze        = "freeze";         // Toggle infinite sustain
-
-    // Texture Parameters
-    inline constexpr const char* blur          = "blur";           // 0-100% spectral blur
-    inline constexpr const char* warmth        = "warmth";         // 0-100% low-pass filtering
-    inline constexpr const char* sparkle       = "sparkle";        // 0-100% high freq enhancement
-
-    // Output Parameters
-    inline constexpr const char* feedback      = "feedback";       // 0-100% grain feedback
-    inline constexpr const char* mix           = "mix";            // 0-100% dry/wet
-    inline constexpr const char* output        = "output";         // -24 to +12 dB
-    inline constexpr const char* bypass        = "bypass";         // Toggle
+    // Character controls (progressively applied per tap)
+    inline constexpr const char* grit     = "grit";     // 0 to 100% - saturation in feedback
+    inline constexpr const char* age      = "age";      // 0 to 100% - per-repeat HF rolloff
+    inline constexpr const char* diffuse  = "diffuse";  // 0 to 100% - allpass diffusion
 }
